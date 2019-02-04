@@ -33,6 +33,7 @@ import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
+import static org.digitalmediaserver.nsis.Utils.OSTYPE;
 import org.digitalmediaserver.nsis.io.FormattedWriter;
 
 /**
@@ -100,6 +101,10 @@ public class GenerateHeaderfileMojo extends AbstractMojo {
 	@Parameter(defaultValue = "${project}", required = true, readonly = true)
 	private MavenProject project;
 
+	private static String fixdir(String dir) {
+		return 	dir!=null && OSTYPE == Utils.OSType.LINUX ? dir.replace("/", "\\")  : dir; //make windows format
+	}
+	
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		if (disabled) {
@@ -126,8 +131,8 @@ public class GenerateHeaderfileMojo extends AbstractMojo {
 			writer.writeln("; Generated from pom.xml version %1$s on %2$tF %2$tT", project.getVersion(), Calendar.getInstance());
 			writer.newLine();
 
-			writer.writeln("!define PROJECT_BASEDIR \"%s\"", project.getBasedir());
-			writer.writeln("!define PROJECT_BUILD_DIR \"%s\"", project.getBuild().getDirectory());
+			writer.writeln("!define PROJECT_BASEDIR \"%s\"", fixdir(project.getBasedir().getPath()));
+			writer.writeln("!define PROJECT_BUILD_DIR \"%s\"", fixdir(project.getBuild().getDirectory()));
 			writer.writeln("!define PROJECT_FINAL_NAME \"%s\"", project.getBuild().getFinalName());
 
 			if (!Utils.isBlank(classifier)) {

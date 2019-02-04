@@ -306,11 +306,17 @@ public class MakeMojo extends AbstractMojo implements ProcessOutputConsumer {
 				path = Paths.get(nsisDir);
 				nsisDir = path.toRealPath().toString();
 			}
+			if (nsisDir!=null && OSTYPE == OSType.LINUX) {
+				nsisDir=nsisDir.replace("/", "\\"); //make windows format
+			}
 			if (isBlank(makeFolder)) {
 				makeFolder = null;
 			} else {
 				path = Paths.get(makeFolder);
 				makeFolder = path.toRealPath().toString();
+			}
+			if (makeFolder!=null && OSTYPE == OSType.LINUX) {
+				makeFolder=makeFolder.replace("/", "\\"); //make windows format
 			}
 			if (isBlank(outputFile)) {
 				outputFile = null;
@@ -420,6 +426,7 @@ public class MakeMojo extends AbstractMojo implements ProcessOutputConsumer {
 		}
 
 		// Script file
+		result.add("--"); //stop processing parameters - fix issue when using linux paths starting with '/' being interpreted as an option
 		result.add(scriptFile);
 		getLog().debug("Processing Script file: \"" + scriptFile + "\"");
 
